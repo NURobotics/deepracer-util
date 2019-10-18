@@ -1,9 +1,12 @@
+<!DOCTYPE html>
 <html>
     <head>
-        <title>Northwestern Robotics Deepracer Tools</title>
+        <title>Deepracer Util</title>
     </head>
     <body>
-        <div id="root"></div>
-        <script type=text/babel src="{{url_for('static', filename='text_editor.js')}}"></script>
+    <header>Deepracer track</header>
+        <canvas id="myCanvas" width="600" height="600"></canvas>
+        <p id="demo">  </p>
+        <script src="{{ url_for('static', filename='js/drawtrack.js') }}"></script>
     </body>
 </html>
