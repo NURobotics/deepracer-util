@@ -16,37 +16,19 @@ for (i = 0; i < point_list.length; ++i) {
 var canvas = document.getElementById('myCanvas');
 var context = canvas.getContext('2d');
 
-for (i = 0; i < point_list.length; ++i) {
-  context.fillRect(point_list[i][0], point_list[i][1], 3, 3);
+
+//Takes in many points and draws a curve through them
+function drawCurve(points, canvas, ctx) {
+  ctx.moveTo(points[0][0], points[0][1]);
+  for (i = 0; i < points.length - 2; ++i) {
+    ctx.bezierCurveTo(
+      points[i][0], points[i][1],
+      points[i + 1][0], points[i + 1][1],
+      points[i + 2][0], points[i + 2][1]
+    )
+    ctx.stroke()
+  }
 }
-
-context.fillStyle = "blue";
-
-for (i = 1; i < (point_list.length - 1); ++i) {
-  var temp = getEdgeEstimate(point_list.slice(i - 1, i + 2));
-  context.fillStyle = "blue";
-  context.fillRect(temp[0][0], temp[0][1], 3, 3);
-  context.fillStyle = "red";
-  context.fillRect(temp[1][0], temp[1][1], 3, 3);
-}
-
-var outline1 = getEdgeEstimate(
-    [point_list[point_list.length - 1], point_list[0], point_list[1]]
-  );
-context.fillStyle = "blue";
-context.fillRect(outline1[0][0], outline1[0][1], 3, 3);
-context.fillStyle = "red";
-context.fillRect(outline1[1][0], outline1[1][1], 3, 3);
-
-var outline2 = getEdgeEstimate(
-    [point_list[point_list.length - 2], point_list[point_list.length - 1], point_list[0]]
-  );
-context.fillStyle = "blue";
-context.fillRect(outline2[0][0], outline2[0][1], 3, 3);
-context.fillStyle = "red";
-context.fillRect(outline2[1][0], outline2[1][1], 3, 3);
-
-context.fillStyle = "green";
 
 
 //Takes in three (ordered) points in and
@@ -54,27 +36,6 @@ context.fillStyle = "green";
 //relative to the middle point
 //**almost works**
 function getEdgeEstimate (points, width=20) {
-/*  var theta1, theta2;
-  if ((points[0][0] - points[1][0] == 0)) {
-    theta1 = -90;
-  } else {
-    theta1 = Math.atan((points[1][1] - points[0][1]) /
-      (points[1][0] - points[0][0]));
-  }
-  if ((points[2][0] - points[1][0] == 0)) {
-    theta2 = -90;
-  } else {
-    theta2 = Math.PI + Math.atan((points[1][1] - points[2][1]) /
-      (points[1][0] - points[2][0]));
-  }
-  var angle = (theta1 + theta2) / 2;
-  var point1 = [points[1][0] + radius * Math.cos(angle),
-    [points[1][1] + radius * Math.sin(angle)]
-  ];
-  var point2 = [points[1][0] - radius * Math.cos(angle),
-    [points[1][1] - radius * Math.sin(angle)]
-  ];
-  return [point1, point2];*/
   var vector1, vector2;
   vector1 = [points[1][0] - points[0][0], points[1][1] - points[0][1]];
   vector2 = [points[2][0] - points[1][0], points[2][1] - points[1][1]];
@@ -107,3 +68,50 @@ function norm(vector) {
   var x = Math.sqrt(vector[0] ** 2 + vector[1] **2);
   return [vector[0] / x, vector[1] / x];
 }
+
+class track {
+  constructor(points, params) {
+    this._points = points;
+    this._params = params;
+  }
+  get points() {
+    return this._points;
+  }
+  set points(pointList) {
+    this._points = pointList;
+  }
+  drawTrackPoints() {
+    var canvas = document.getElementById('myCanvas');
+    var context = canvas.getContext('2d');
+    for (i = 1; i < (this._points.length - 1); ++i) {
+      var temp = getEdgeEstimate(this._points.slice(i - 1, i + 2));
+      context.fillStyle = "blue";
+      context.fillRect(temp[0][0], temp[0][1], 3, 3);
+      context.fillStyle = "red";
+      context.fillRect(temp[1][0], temp[1][1], 3, 3);
+    }
+    var outline1 = getEdgeEstimate(
+        [this._points[this._points.length - 1],
+         this._points[0], this._points[1]]
+      );
+    var outline2 = getEdgeEstimate(
+        [this._points[this._points.length - 2],
+         this._points[this._points.length - 1], this._points[0]]
+      );
+    context.fillStyle = "blue";
+    context.fillRect(outline1[0][0], outline1[0][1], 3, 3);
+    context.fillRect(outline2[0][0], outline2[0][1], 3, 3);
+    context.fillStyle = "red";
+    context.fillRect(outline1[1][0], outline1[1][1], 3, 3);
+    context.fillRect(outline2[1][0], outline2[1][1], 3, 3);
+  }
+  drawTrackCurve() {
+    //stuff here
+    return 0;
+  }
+}
+
+
+var testTrack = new track(point_list, 0);
+testTrack.drawTrackPoints();
+drawCurve(testTrack.points, canvas, context);
