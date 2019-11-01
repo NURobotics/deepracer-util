@@ -2,11 +2,20 @@
 <html>
     <head>
         <title>Deepracer Util</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/deepracer.css') }}">
     </head>
     <body>
-    <header>Deepracer track</header>
-        <canvas id="myCanvas" width="600" height="600"></canvas>
-        <p id="demo">  </p>
+        <header>Deepracer track</header>
+        <div id='main'>
+            <div id='track'>
+                <canvas id="myCanvas" width="600" height="600"></canvas>
+                <p id="demo">  </p>
+            </div>
+            <div id='editor'>
+                <textarea id="text-editor"></textarea>
+            </div>
+        </div>
+        
         <script src="{{ url_for('static', filename='js/drawtrack.js') }}"></script>
     </body>
 </html>
