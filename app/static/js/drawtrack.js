@@ -50,6 +50,11 @@ function MatrixVectorMult(vector, matrix) {
   return [x, y];
 }
 
+function matrixRotation(vector, angle) {
+  return MatrixVectorMult(vector, [[Math.cos(angle), Math.sin(angle)], 
+                                   [-1 * Math.sin(angle), Math.cos(angle)]])
+}
+
 function norm(vector) {
   var x = Math.sqrt(vector[0] ** 2 + vector[1] **2);
   return [vector[0] / x, vector[1] / x];
@@ -59,7 +64,6 @@ function distance(point1, point2) {
   return Math.sqrt((point1[0] - point2[0]) ** 2 +
                    (point1[1] - point2[0]) ** 2)
 }
-
 
 
 class track {
@@ -140,11 +144,12 @@ class track {
     //stuff here
     var canvas = document.getElementById('myCanvas');
     var context = canvas.getContext('2d');
+    context.fillStyle = 'green';
+    context.fillRect(0, 0, 600, 300);
     if (this.InnerVsOuter()) {
       var inner = this.getEdgePoints()[1];
       var outer = this.getEdgePoints()[0];
-    }
-    else {
+    } else {
       var inner = this.getEdgePoints()[0];
       var outer = this.getEdgePoints()[1];
     }
@@ -182,10 +187,65 @@ class car {
     this._y = coord[1];
   }
   drawCar() {
-    //stuff here
+    var canvas = document.getElementById('myCanvas');
+    var context = canvas.getContext('2d');
+    var vertices = [];
+    vertices.push(matrixRotation([16, 0], this._orientation));
+    vertices.push((matrixRotation([8, 0], this._orientation + (Math.PI * 2 / 3))));
+    vertices.push((matrixRotation([8, 0], this._orientation - (Math.PI * 2 / 3))));
+    context.beginPath();
+    context.fillStyle = 'red';
+    for (i = 0; i < 3; ++i) {
+      context.lineTo(this._x * 50 + vertices[i][0], this._y * 50 + vertices[i][1]);
+    }
+    context.closePath();
+    context.fill();
+    //context.fillRect((this._x * 50), (this._y * 50), 8, 8);
   }
 }
 
 
-var testTrack = new track(point_list, 0);
+var testTrack = new track(point_list, .5);
+var testCar = new car(2.5, .75, 0);
 testTrack.drawTrackCurve();
+testCar.drawCar();
+
+
+shiftDown = false;
+window.addEventListener("keydown", toggleShift);
+function toggleShift(event) {
+  if (event.key == "Shift") {
+    shiftDown = !(shiftDown);
+  }
+}
+
+
+window.addEventListener("keydown", reDrawLoop);
+function reDrawLoop(event) {
+  var delta = .05;
+  if (shiftDown) {
+    delta = 1;
+  }
+  if (event.key == "ArrowUp") {
+    testCar._y += -delta;
+  } 
+  if (event.key == "ArrowDown") {
+    testCar._y += delta;
+  } 
+  if (event.key == "ArrowLeft") {
+    testCar._x += -delta;
+  } 
+  if (event.key == "ArrowRight") {
+    testCar._x += delta;
+  } 
+  if ((event.key == "a") || (event.key == "A")) {
+    testCar._orientation += delta;
+  } 
+  if ((event.key == "d") || (event.key == "D")) {
+    testCar._orientation -= delta;
+  }
+  testTrack.drawTrackCurve();
+  testCar.drawCar();
+}
+
+
